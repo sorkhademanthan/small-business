@@ -1,6 +1,8 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as dotenv from 'dotenv'; // Load env vars if running scripts directly
+import * as dotenv from 'dotenv';
+// Import the schema to enable Relational Queries (db.query...)
+import * as schema from '@/db/schema';
 
 dotenv.config({ path: '.env.local' });
 
@@ -13,4 +15,5 @@ if (!connectionString) {
 // Disable prefetch as it is not supported for "Transaction" pool mode
 const client = postgres(connectionString, { prepare: false });
 
-export const db = drizzle(client);
+// Pass the schema here
+export const db = drizzle(client, { schema });
