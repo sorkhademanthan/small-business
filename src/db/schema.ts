@@ -2,7 +2,8 @@ import { pgTable, uuid, text, timestamp, boolean, pgEnum, integer } from 'drizzl
 import { relations } from 'drizzle-orm';
 
 // --- ENUMS ---
-export const statusEnum = pgEnum('status', ['confirmed', 'cancelled', 'noshow']);
+// Added 'completed' to the enum list
+export const statusEnum = pgEnum('status', ['confirmed', 'cancelled', 'noshow', 'completed']);
 
 // --- TABLES ---
 
