@@ -1,3 +1,7 @@
+import { db } from "@/lib/db";
+import { appointments } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
 /**
  * Utility to send WhatsApp Template Messages via Meta Graph API
  */
@@ -13,8 +17,22 @@ interface TemplateComponent {
 export async function sendWhatsAppMessage(
   to: string,
   templateName: string,
-  components: TemplateComponent[] = []
+  components: TemplateComponent[] = [],
+  checkIdempotencyKey?: string // Optional Appointment ID to prevent duplicate sends
 ) {
+  // Safety Check: Idempotency
+  if (checkIdempotencyKey) {
+    const existing = await db.query.appointments.findFirst({
+        where: eq(appointments.id, checkIdempotencyKey),
+        columns: { reminderSent: true } // Only fetch what we need
+    });
+
+    if (existing && existing.reminderSent) {
+        console.warn(`⚠️ Duplicate send prevented for Appointment ${checkIdempotencyKey}`);
+        return { success: false, error: "Duplicate send prevented: Reminder already sent." };
+    }
+  }
+
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
