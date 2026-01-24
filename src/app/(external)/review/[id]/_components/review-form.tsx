@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent } from 'react';
+import { useRouter } from 'next/navigation'; // Added useRouter
 import { Star, MessageSquare, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,6 +22,7 @@ export function ReviewForm({
   customerName, 
   googleReviewLink 
 }: ReviewFormProps) {
+  const router = useRouter(); // Initialize router
   const [step, setStep] = useState<'rating' | 'feedback' | 'redirect'>('rating');
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
@@ -41,6 +43,13 @@ export function ReviewForm({
     } else {
       setStep('feedback');
     }
+  };
+
+  const handleGoogleClick = () => {
+    // 1. Open Google Review in a new tab so they can review
+    window.open(googleReviewLink, '_blank');
+    // 2. Redirect this tab to the Referral/Thank you page
+    router.push(`/review/${appointmentId}/thank-you`);
   };
 
   const handlePrivateSubmit = async () => {
@@ -106,14 +115,14 @@ export function ReviewForm({
           <Button 
             size="lg" 
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg h-14"
-            onClick={() => window.location.href = googleReviewLink}
+            onClick={handleGoogleClick}
           >
             Rate on Google Maps
           </Button>
           <Button 
             variant="ghost" 
             className="mt-4 text-slate-400"
-            onClick={() => alert("Thanks anyway!")}
+            onClick={() => router.push(`/review/${appointmentId}/thank-you`)}
           >
             No thanks, maybe later
           </Button>
@@ -151,4 +160,3 @@ export function ReviewForm({
     </div>
   );
 }
-  
