@@ -24,6 +24,10 @@ export const customers = pgTable('customers', {
   phone: text('phone').notNull(),
   email: text('email'),
   createdAt: timestamp('created_at').defaultNow(),
+  // --- WIN-BACK ENGINE COLUMNS ---
+  lastVisitAt: timestamp('last_visit_at'),
+  marketingOptIn: boolean('marketing_opt_in').default(true),
+  lastWinbackSentAt: timestamp('last_winback_sent_at'),
 });
 
 export const appointments = pgTable('appointments', {

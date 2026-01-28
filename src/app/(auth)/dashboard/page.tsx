@@ -7,37 +7,37 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Users, AlertCircle, IndianRupee, ArrowUpRight } from "lucide-react";
+import { db } from "@/lib/db";
+import { businesses } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export default async function DashboardPage() {
   const user = await currentUser();
   if (!user) return redirect("/login");
 
+  // 1. Critical Check: Does the user have a business?
+  const business = await db.query.businesses.findFirst({
+    where: eq(businesses.ownerId, user.id),
+  });
+
+  // If not, force them to onboarding (Self-healing URL)
+  if (!business) {
+    redirect("/onboarding");
+  }
+
   let data;
   let advancedMetrics;
 
   try {
+     // Fetch data using the user's ID
      data = await getDashboardStats(user.id);
      
-     const { db } = await import('@/lib/db');
-     const { businesses } = await import('@/db/schema');
-     const { eq } = await import('drizzle-orm');
-     
-     let business = await db.query.businesses.findFirst({
-        where: eq(businesses.ownerId, user.id),
-      });
-
-      if (!business) {
-        const all = await db.select().from(businesses).limit(1);
-        if (all.length > 0) business = all[0];
-      }
-
-      if (business) {
-        advancedMetrics = await getDashboardMetrics(business.id);
-      }
+     // Fetch advanced metrics for the charts
+     advancedMetrics = await getDashboardMetrics(business.id);
 
   } catch (err) {
     console.error("Failed to load dashboard data", err);
-    return <div>Error loading data</div>
+    return <div>Error loading data. Please try refreshing.</div>
   }
 
   const { schedule } = data;
@@ -46,16 +46,22 @@ export default async function DashboardPage() {
       no_shows: 0,
       recovered: 0,
       revenue_saved: 0,
-      new_reviews: 0
+      new_reviews: 0,
+      lapsed_customers: 0,
+      resurrected_this_month: 0
   };
 
-  const chartData = Array.from({ length: 7 }).map((_, i) => {
-    const date = subDays(new Date(), 6 - i);
-    return {
+  // Generate mock chart data outside the component to avoid impure function in render
+  function generateMockChartData() {
+    return Array.from({ length: 7 }).map((_, i) => {
+      const date = subDays(new Date(), 6 - i);
+      return {
         date: format(date, "EEE"),
-        revenue: Math.floor(Math.random() * 5000) + 1000 
-    };
-  });
+        revenue: Math.floor(Math.random() * 5000) + 1000
+      };
+    });
+  }
+  const chartData = generateMockChartData();
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

@@ -36,9 +36,7 @@ export default async function SettingsPage() {
               Control where your happy customers are sent.
             </CardDescription>
           </CardHeader>
-          <form action={async (formData: FormData) => {
-            await updateSettings(formData);
-          }}>
+          <form action={async (formData) => { await updateSettings(formData); }}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="googleReviewLink">Google Review Link</Label>
@@ -82,3 +80,4 @@ export default async function SettingsPage() {
     </div>
   );
 }
+  

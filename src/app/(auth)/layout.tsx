@@ -14,7 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 
 const sidebarLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -22,6 +22,15 @@ const sidebarLinks = [
   { name: 'Customers', href: '/customers', icon: Users },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
+
+// Safe client-only check without useEffect
+function useIsMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
 const NavContent = ({ 
   pathname, 
@@ -82,6 +91,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { user } = useUser();
+  const isMounted = useIsMounted();
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -95,16 +105,22 @@ export default function DashboardLayout({
         {/* Top Header */}
         <header className="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-white/80 backdrop-blur-sm border-b border-slate-200">
           <div className="flex items-center gap-4 md:hidden">
-            <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-              <SheetTrigger asChild>
+            {isMounted ? (
+              <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="-ml-2">
+                    <Menu className="w-6 h-6 text-slate-700" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-64 border-r-0">
+                   <NavContent pathname={pathname} onLinkClick={() => setIsMobileOpen(false)} />
+                </SheetContent>
+              </Sheet>
+            ) : (
                 <Button variant="ghost" size="icon" className="-ml-2">
-                  <Menu className="w-6 h-6 text-slate-700" />
+                    <Menu className="w-6 h-6 text-slate-700" />
                 </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-64 border-r-0">
-                 <NavContent pathname={pathname} onLinkClick={() => setIsMobileOpen(false)} />
-              </SheetContent>
-            </Sheet>
+            )}
             <span className="font-bold text-lg">ReBook</span>
           </div>
           
@@ -117,7 +133,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Page Content with Background Pattern */}
+        {/* Page Content */}
         <main className="flex-1 p-6 md:p-8 overflow-y-auto w-full max-w-7xl mx-auto">
           {children}
         </main>

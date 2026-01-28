@@ -25,14 +25,13 @@ export default async function BookingPage({
   }
 
   // 2. Mock "Next Available Slots"
-  // In a real app, this would query the DB for free time windows.
   const tomorrow = addDays(new Date(), 1);
   const dayAfter = addDays(new Date(), 2);
 
   const slots = [
-    setMinutes(setHours(tomorrow, 10), 0), // Tomorrow 10:00 AM
-    setMinutes(setHours(tomorrow, 14), 0), // Tomorrow 2:00 PM
-    setMinutes(setHours(dayAfter, 11), 0), // Day After 11:00 AM
+    setMinutes(setHours(tomorrow, 10), 0),
+    setMinutes(setHours(tomorrow, 14), 0),
+    setMinutes(setHours(dayAfter, 11), 0),
   ];
 
   return (
@@ -46,17 +45,17 @@ export default async function BookingPage({
 
         {/* Current Details */}
         <div className="p-6 border-b bg-slate-50/50">
-<p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-  Currently Scheduled
-</p>
-<div className="flex items-baseline gap-2">
-   <p className="text-3xl font-bold text-slate-900">
-      {format(new Date(appointment.startTime), "d MMM")}
-   </p>
-   <p className="text-xl text-slate-600">
-      {format(new Date(appointment.startTime), "h:mm a")}
-   </p>
-</div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            Currently Scheduled
+          </p>
+          <div className="flex items-baseline gap-2">
+             <p className="text-3xl font-bold text-slate-900">
+                {format(new Date(appointment.startTime), "d MMM")}
+             </p>
+             <p className="text-xl text-slate-600">
+                {format(new Date(appointment.startTime), "h:mm a")}
+             </p>
+          </div>
         </div>
 
         {/* Interactive Slots Component */}
@@ -70,3 +69,4 @@ export default async function BookingPage({
     </div>
   );
 }
+

@@ -1,37 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { Loader2, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { rescheduleAppointment } from '@/server/actions/reschedule';
-import { cn } from '@/lib/utils';
-import confetti from 'canvas-confetti';
+import { useState } from "react";
+import { format } from "date-fns";
+import { Loader2, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { rescheduleAppointment } from "@/server/actions/reschedule";
+import { cn } from "@/lib/utils";
 
 interface RescheduleOptionsProps {
   appointmentId: string;
   slots: Date[];
 }
 
-export function RescheduleOptions({ appointmentId, slots }: RescheduleOptionsProps) {
+export function RescheduleOptions({
+  appointmentId,
+  slots,
+}: RescheduleOptionsProps) {
   const [loading, setLoading] = useState<number | null>(null);
   const [success, setSuccess] = useState(false);
 
   const handleSlotClick = async (date: Date, index: number) => {
     setLoading(index);
-    
-    // Call Server Action
+
     const res = await rescheduleAppointment(appointmentId, date);
 
     if (res.success) {
       setSuccess(true);
       setLoading(null);
-      // Trigger Confetti Animation
-      confetti({
-        particleCount: 150,
-        spread: 60,
-        origin: { y: 0.6 }
-      });
     } else {
       alert("Something went wrong. Please call the business.");
       setLoading(null);
@@ -54,9 +49,7 @@ export function RescheduleOptions({ appointmentId, slots }: RescheduleOptionsPro
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-slate-900">
-        Select a new time:
-      </p>
+      <p className="text-sm font-medium text-slate-900">Select a new time:</p>
       <div className="grid gap-3">
         {slots.map((date, idx) => (
           <Button
@@ -88,3 +81,4 @@ export function RescheduleOptions({ appointmentId, slots }: RescheduleOptionsPro
     </div>
   );
 }
+           
