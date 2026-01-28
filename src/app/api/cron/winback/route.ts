@@ -48,7 +48,7 @@ export async function GET() {
 
         const response = await sendWhatsAppMessage(
           customer.phone,
-          'hello_world',
+          'hello_world', // Generic template
           []
         );
 
@@ -79,4 +79,3 @@ export async function GET() {
     return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
-   

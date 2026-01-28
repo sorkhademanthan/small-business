@@ -43,12 +43,14 @@ export async function GET() {
     const results = await Promise.all(
       upcomingAppointments.map(async (apt) => {
         const formattedTime = format(apt.startTime, 'h:mm a');
+        const rescheduleLink = `${process.env.NEXT_PUBLIC_APP_URL}/book/${apt.id}`;
 
-        // Send WhatsApp - Using hello_world template for testing
+        // Send WhatsApp - Using hello_world as fallback
         const response = await sendWhatsAppMessage(
           apt.customerPhone,
-          'hello_world', // Change from 'appointment_reminder_24h' to 'hello_world'
-          [] // hello_world template has no parameters
+          'hello_world', // Generic template (no variables)
+          [], // No parameters needed
+          apt.id // Idempotency key
         );
 
         if (response.success) {
@@ -66,6 +68,16 @@ export async function GET() {
     );
 
     return NextResponse.json({
+      success: true,
+      processed: results.length,
+      details: results,
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Cron Job Failed:', error);
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
+  }
+}
       success: true,
       processed: results.length,
       details: results,

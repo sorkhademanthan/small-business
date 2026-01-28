@@ -41,11 +41,12 @@ export async function markAppointmentComplete(appointmentId: string) {
     // 3. Construct the Smart Review Link
     const reviewLink = `${process.env.NEXT_PUBLIC_APP_URL}/review/${appointmentId}`;
 
-    // 4. Send WhatsApp (using hello_world for testing if template not approved)
+    // 4. Send WhatsApp - Using hello_world template
     const response = await sendWhatsAppMessage(
         customer.phone,
-        'hello_world', // Change to 'review_request_v1' once approved
-        []
+        'hello_world', // Generic template
+        [],
+        appointmentId // Idempotency key
     );
 
     if (!response.success) {
