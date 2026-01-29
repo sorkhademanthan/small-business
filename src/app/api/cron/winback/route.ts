@@ -48,7 +48,7 @@ export async function GET() {
 
         const response = await sendWhatsAppMessage(
           customer.phone,
-          'hello_world', // Generic template
+          'hello_world',
           []
         );
 

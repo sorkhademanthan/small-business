@@ -45,12 +45,12 @@ export async function GET() {
         const formattedTime = format(apt.startTime, 'h:mm a');
         const rescheduleLink = `${process.env.NEXT_PUBLIC_APP_URL}/book/${apt.id}`;
 
-        // Send WhatsApp - Using hello_world as fallback
+        // Send WhatsApp - Using hello_world (no custom template available)
         const response = await sendWhatsAppMessage(
           apt.customerPhone,
-          'hello_world', // Generic template (no variables)
-          [], // No parameters needed
-          apt.id // Idempotency key
+          'hello_world',
+          [],
+          apt.id // Idempotency check
         );
 
         if (response.success) {
